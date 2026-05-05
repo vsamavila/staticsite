@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks
 
 
 class TestSplitNodesDelimiter(unittest.TestCase):
@@ -85,6 +85,36 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
         )
         self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_text_to_textnodes_bold_only(self):
+        nodes = text_to_textnodes("Hello **world** today")
+        self.assertEqual(len(nodes), 3)
+        self.assertEqual(nodes[0], TextNode("Hello ", TextType.TEXT))
+        self.assertEqual(nodes[1], TextNode("world", TextType.BOLD))
+        self.assertEqual(nodes[2], TextNode(" today", TextType.TEXT))
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is one block
+
+This is another block
+that continues on a second line
+
+- list item 1
+- list item 2
+"""
+        blocks = markdown_to_blocks(md)
+
+        self.assertEqual(
+            blocks,
+            [
+                "This is one block",
+                "This is another block\nthat continues on a second line",
+                "- list item 1\n- list item 2"
+            ],
+        )
+
+
 
 
 
